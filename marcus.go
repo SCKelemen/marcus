@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"encoding/json"
+
 )
 
 func main() {
@@ -34,10 +35,16 @@ func (l *LatLon) Build() string {
 	return fmt.Sprintf(endpoint, l.Latitude, l.Longitude, apiKey)
 }
 func WeatherHandler(w http.ResponseWriter, r *http.Request) {
-	jsonBody, err := json.Marshal(&LatLon{})
-	if err != nil {
-		http.Error(w, "Error converting results to json",
-			http.StatusInternalServerError)
+	var l LatLon
+	if r.Body == nil {
+		http.Error(w, "Please send a request body", 400)
+		return
 	}
-	w.Write(jsonBody)
+	err := json.NewDecoder(r.Body).Decode(&l)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	response, err := http.Get(l.Build())
+	json.NewEncoder(w).Encode(response)
 }
