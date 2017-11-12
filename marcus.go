@@ -2,19 +2,20 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"encoding/json"
 )
 
 func main() {
 	fmt.Println("good to Go")
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", GetHandler)
-	mux.HandleFunc("/post", PostHandler)
+	mux.HandleFunc("/get-weather", WeatherHandler)
 
 }
 
 const (
-	apiKey = ""
-	endpoint = "http://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s"
+	apiKey = "42dc862aa7bc58b4d96964d"
+	endpoint = "http://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&appid=%s"
 )
 
 type Url struct {
@@ -32,7 +33,7 @@ func (u *Url) Longitude(longitude string) {
 }
 
 func (u *Url) Build() string {
-	return fmt.Sprintf(endpoint, u.Lat, u.Lon)
+	return fmt.Sprintf(endpoint, u.Lat, u.Lon, apiKey)
 }
 
 type Weather struct {
@@ -40,4 +41,16 @@ type Weather struct {
 	humidity int
 	pressure int
 	temp int
+}
+type LatLon struct {
+	Latitude string `json: lat`
+	Longitude string `json: lon`
+}
+func WeatherHandler(w http.ResponseWriter, r *http.Request) {
+	jsonBody, err := json.Marshal(&LatLon{})
+	if err != nil {
+		http.Error(w, "Error converting results to json",
+			http.StatusInternalServerError)
+	}
+	w.Write(jsonBody)
 }
