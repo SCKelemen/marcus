@@ -34,3 +34,10 @@ func (u *Url) Longitude(longitude string) {
 func (u *Url) Build() string {
 	return fmt.Sprintf(endpoint, u.Lat, u.Lon)
 }
+
+type Weather struct {
+	description string
+	humidity int
+	pressure int
+	temp int
+}
