@@ -18,23 +18,7 @@ const (
 	endpoint = "http://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&appid=%s"
 )
 
-type Url struct {
-	Endpoint string 
-	Lat string
-	Lon string
-}
 
-func (u *Url) Latitude(latitude string) {
-	u.Lat = latitude 
-}
-
-func (u *Url) Longitude(longitude string) {
-	u.Lon = longitude
-}
-
-func (u *Url) Build() string {
-	return fmt.Sprintf(endpoint, u.Lat, u.Lon, apiKey)
-}
 
 type Weather struct {
 	description string
@@ -43,8 +27,11 @@ type Weather struct {
 	temp int
 }
 type LatLon struct {
-	Latitude string `json: lat`
-	Longitude string `json: lon`
+	Latitude string `json:"lat"`
+	Longitude string `json:"lon"`
+}
+func (l *LatLon) Build() string {
+	return fmt.Sprintf(endpoint, l.Latitude, l.Longitude, apiKey)
 }
 func WeatherHandler(w http.ResponseWriter, r *http.Request) {
 	jsonBody, err := json.Marshal(&LatLon{})
